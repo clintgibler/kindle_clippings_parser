@@ -1,0 +1,2 @@
+defmodule KindleClippingsParser do
+end
