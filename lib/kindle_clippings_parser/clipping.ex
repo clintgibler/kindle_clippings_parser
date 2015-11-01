@@ -37,17 +37,20 @@ defmodule KindleClippingsParser.Clipping do
   Lisp is really awesome because of...                                 # text
   """
   def from_text(text) do
-    [book_name, range_and_time_added_line, _newline_separator | text] = String.split(text, "\n")
-    {highlight_range, time_added} = get_highlight_range_and_time_added(range_and_time_added_line)
+    case String.split(text, "\n") do
+      [book_name, range_and_time_added_line, _newline_separator | text] ->
+        {highlight_range, time_added} = get_highlight_range_and_time_added(range_and_time_added_line)
 
-    %Clipping{book_name: book_name, highlight_range: highlight_range,
-              time_added: time_added, text: Enum.join(text, "\n") |> String.strip}
+        %Clipping{book_name: String.strip(book_name), highlight_range: highlight_range,
+                  time_added: time_added, text: Enum.join(text, "\n") |> String.strip}
+      _ -> nil
+    end
   end
 
   def get_highlight_range_and_time_added(line) do
     [part_matched, highlight_range, time_added] = Regex.run(
-      ~r/- Highlight Loc. (?<highlight_range>\d+[-\d+]*) \| Added on (?<time_added>.+)/, line)
-
+      ~r/- \w+ Loc. (?<highlight_range>\d+[-\d+]*) \| Added on (?<time_added>.+)/, line)
+    # Highlight | Bookmark
     {highlight_range, time_added}
   end
 end
